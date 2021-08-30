@@ -5,4 +5,6 @@ export interface BasektItem {
 }
 
 export type GetBasketRes = BasektItem[];
-export type GetBasketTotalPriceRes = number | null;
+export type GetBasketTotalPriceRes =
+  | number
+  | { isSuccess: false; alternativeBasket: GetBasketRes };

@@ -31,13 +31,17 @@ export class BasketService {
     return this.userBasket;
   }
   getBasketTotalPrice(): GetBasketTotalPriceRes {
-    let totalPrice = 0;
-    this.getBasket().forEach((item) => {
-      if (this.shopService.hasProduct(item.name))
-        totalPrice += this.shopService.getItemPrice(item.name) * item.amount;
-    });
+    const alternativeBasket = this.getBasket().map(
+      (item) => this.shopService.hasProduct(item.name) && item,
+    );
+    const totalPrice = this.getBasket()
+      .map((item) => {
+        if (this.shopService.hasProduct(item.name))
+          return this.shopService.getItemPrice(item.name) * item.amount * 1.23;
+      })
+      .reduce((prev, curr) => prev + curr, 0);
     if (totalPrice) return totalPrice;
-    else return null;
+    else return { isSuccess: false, alternativeBasket };
   }
 
   addToBasket({ name, amount }): AddToBasketRes {
