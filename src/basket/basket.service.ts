@@ -1,5 +1,5 @@
 import { uuid } from 'uuidv4';
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Scope } from '@nestjs/common';
 import {
   BasektItem,
   GetBasketTotalPriceRes,
@@ -20,7 +20,9 @@ export interface DeleteFromBasektRes {
   success: boolean;
 }
 
-@Injectable()
+@Injectable({
+  scope: Scope.REQUEST,
+})
 export class BasketService {
   private userBasket: BasektItem[] = [];
   constructor(
