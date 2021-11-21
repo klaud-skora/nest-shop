@@ -24,13 +24,15 @@ export class BasketController {
     return this.basketService.getBasket();
   }
   @Get('/total-price')
-  getBasketTotalPrice(): GetBasketTotalPriceRes {
+  getBasketTotalPrice(): Promise<GetBasketTotalPriceRes> {
     return this.basketService.getBasketTotalPrice();
   }
 
   @Post('/')
-  addToBasket(@Body() { name, amount }: AddToBasketDto): AddToBasketRes {
-    return this.basketService.addToBasket({ name, amount });
+  addToBasket(
+    @Body() { name, amount, id }: AddToBasketDto,
+  ): Promise<AddToBasketRes> {
+    return this.basketService.addToBasket({ name, amount, id });
   }
 
   @Delete('/:id')

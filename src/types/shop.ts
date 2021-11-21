@@ -5,3 +5,7 @@ export interface Product {
 }
 
 export type GetProductsListRes = Product[];
+
+export type GetOneProductRes = Product;
+
+export type CreatedNewProduct = Product;

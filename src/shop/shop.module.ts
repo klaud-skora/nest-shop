@@ -7,8 +7,8 @@ import { ShopService } from './shop.service';
 
 @Module({
   imports: [
+    // TypeOrmModule.forFeature([ShopItem]),  data mapper => active record
     forwardRef(() => BasketModule),
-    TypeOrmModule.forFeature([ShopItem]),
   ],
   controllers: [ShopController],
   providers: [ShopService],

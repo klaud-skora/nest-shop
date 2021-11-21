@@ -1,7 +1,8 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+// import { Product } from '../types/shop'; // Data Mapper => Active Record (implements Product => extends BaseEntity)
 
 @Entity()
-export class ShopItem {
+export class ShopItem extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -14,7 +15,7 @@ export class ShopItem {
     length: 10000,
     default: '',
   })
-  description: string;
+  desc: string;
 
   @Column({
     type: 'float',
@@ -22,4 +23,19 @@ export class ShopItem {
     scale: 2,
   })
   price: number;
+
+  @Column({
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  createdAt: Date;
+
+  @Column({
+    default: 0,
+  })
+  boughtCounter: number;
+
+  @Column({
+    default: false,
+  })
+  wasEverBought: boolean;
 }

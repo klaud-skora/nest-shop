@@ -6,6 +6,7 @@ import {
   GetBasketRes,
 } from '../types/basket';
 import { ShopService } from '../shop/shop.service';
+import { AddToBasketDto } from './dto/addToBasket.dto';
 
 export type AddToBasketRes =
   | {
@@ -32,31 +33,49 @@ export class BasketService {
   getBasket(): GetBasketRes {
     return this.userBasket;
   }
-  getBasketTotalPrice(): GetBasketTotalPriceRes {
-    const alternativeBasket = this.getBasket().map(
-      (item) => this.shopService.hasProduct(item.name) && item,
-    );
-    const totalPrice = this.getBasket()
-      .map((item) => {
-        if (this.shopService.hasProduct(item.name))
-          return this.shopService.getItemPrice(item.name) * item.amount * 1.23;
-      })
-      .reduce((prev, curr) => prev + curr, 0);
-    if (totalPrice) return totalPrice;
-    else return { isSuccess: false, alternativeBasket };
+  async getBasketTotalPrice(): Promise<GetBasketTotalPriceRes> {
+    if (
+      !this.userBasket.every((item) => this.shopService.hasProduct(item.name))
+    ) {
+      const alternativeBasket = this.getBasket().filter((item) =>
+        this.shopService.hasProduct(item.name),
+      );
+
+      return {
+        isSuccess: false,
+        alternativeBasket,
+      };
+    }
+
+    // return (
+    //   (await Promise.all(
+    //     this.userBasket.map(
+    //       async (item) => (await this.shopService.getItemPrice(item.name)) *
+    //         item.amount *
+    //         1.23
+    //     )))
+    //   )
+    // ).reduce((prev, curr) => prev + curr, 0);
+    // )
   }
 
-  addToBasket({ name, amount }): AddToBasketRes {
+  async addToBasket({
+    name,
+    amount,
+    id,
+  }: AddToBasketDto): Promise<AddToBasketRes> {
     if (
       name &&
       amount &&
       amount > 0 &&
-      this.shopService
-        .getProductsList()
-        .find((product) => product.name === name)
+      (await this.shopService.getProductsList()).find(
+        (product) => product.name === name,
+      )
     ) {
-      const id = uuid();
+      // const id = uuid();
       this.userBasket.push({ name, amount, id });
+      this.shopService.addBoughtCounter(id);
+
       console.log('User basket state after adding item: ', this.userBasket);
       return { success: true, id };
     } else return { success: false };
