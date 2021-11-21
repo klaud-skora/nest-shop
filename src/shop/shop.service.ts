@@ -2,7 +2,7 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BasketService } from 'src/basket/basket.service';
 import { Repository } from 'typeorm';
-import { GetProductsListRes, Product } from '../types/shop';
+import { Product, GetPaginatedListOfProductsResponse } from '../types/shop';
 import { ShopItem } from './shop-item.entity';
 
 @Injectable()
@@ -12,7 +12,9 @@ export class ShopService {
     private basketService: BasketService, // @InjectRepository(ShopItem) // private shopItemRepository: Repository<ShopItem>, => active record
   ) {}
 
-  async getProductsList(): Promise<GetProductsListRes> {
+  async getProductsList(
+    currentPage = 1,
+  ): Promise<GetPaginatedListOfProductsResponse> {
     // return [
     //   {
     //     name: 'Shampoo',
@@ -31,7 +33,25 @@ export class ShopService {
     //   },
     // ];
     // return await this.shopItemRepository.find();
-    return ShopItem.find();
+    // const count = await ShopItem.count();
+    // console.log(count);
+    // return await ShopItem.find({
+    //   skip: 2,
+    //   take: 2,
+    // });
+
+    const maxPerPage = 10;
+    // const currentPage = 3;
+
+    const [items, count] = await ShopItem.findAndCount({
+      skip: maxPerPage * (currentPage - 1),
+      take: maxPerPage,
+    });
+
+    const totalPages = Math.ceil(count / maxPerPage);
+    console.log(count);
+    console.log('totalPages', totalPages);
+    return { items, pages: totalPages, totalNumberOfItems: count };
   }
 
   async getOneProduct(id: string): Promise<Product> {
@@ -69,11 +89,14 @@ export class ShopService {
   }
 
   async hasProduct(name: string): Promise<boolean> {
-    return (await this.getProductsList()).some((item) => item.name === name);
+    return (await (await this.getProductsList()).items).some(
+      (item) => item.name === name,
+    );
   }
   async getItemPrice(name: string): Promise<number> {
-    return (await this.getProductsList()).find((item) => item.name === name)
-      .price;
+    return (await (await this.getProductsList()).items).find(
+      (item) => item.name === name,
+    ).price;
   }
 
   async countPromo() {

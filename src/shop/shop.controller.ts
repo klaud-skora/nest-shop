@@ -8,7 +8,7 @@ import {
   Scope,
 } from '@nestjs/common';
 import {
-  GetProductsListRes,
+  GetPaginatedListOfProductsResponse,
   GetOneProductRes,
   CreatedNewProduct,
 } from '../types/shop';
@@ -29,9 +29,11 @@ export class ShopController {
   }
   constructor(@Inject(ShopService) private shopService: ShopService) {}
 
-  @Get('/')
-  getProductsList(): Promise<GetProductsListRes> {
-    return this.shopService.getProductsList();
+  @Get('/:page')
+  getProductsList(
+    @Param('page') page: string,
+  ): Promise<GetPaginatedListOfProductsResponse> {
+    return this.shopService.getProductsList(Number(page));
   }
 
   @Get('/:id')

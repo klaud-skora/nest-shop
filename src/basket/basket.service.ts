@@ -68,7 +68,7 @@ export class BasketService {
       name &&
       amount &&
       amount > 0 &&
-      (await this.shopService.getProductsList()).find(
+      (await (await this.shopService.getProductsList()).items).find(
         (product) => product.name === name,
       )
     ) {
