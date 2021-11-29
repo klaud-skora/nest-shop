@@ -11,6 +11,7 @@ import {
   GetPaginatedListOfProductsResponse,
   GetOneProductRes,
   CreatedNewProduct,
+  GetProductsListRes,
 } from '../types/shop';
 import { ShopService } from './shop.service';
 
@@ -42,6 +43,14 @@ export class ShopController {
     // if (!product) throw new Error('Product not found');
     // return product;
     return this.shopService.getOneProduct(id);
+  }
+
+  @Get('/search/:searchTerm')
+  getSearchedProduct(@Param('searchTerm') searchTerm: string) {
+    // const product = this.shopService.getOneProduct(id);
+    // if (!product) throw new Error('Product not found');
+    // return product;
+    return this.shopService.findProduct(searchTerm);
   }
 
   @Delete('/:id')
